@@ -1,0 +1,25 @@
+goos: darwin
+goarch: arm64
+pkg: advent-of-code/2019/day-1
+BenchmarkPartOne-10    	  319518	      3871 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  326353	      3723 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  322473	      3865 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  295027	      3787 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  310383	      3787 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  325399	      3765 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  318494	      3739 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  321950	      3746 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  299600	      3738 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartOne-10    	  321309	      3846 ns/op	    2496 B/op	       2 allocs/op
+BenchmarkPartTwo-10    	   24068	     48236 ns/op	   46071 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   24763	     46110 ns/op	   46067 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   25984	     46409 ns/op	   46070 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   26011	     46178 ns/op	   46062 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   25984	     48657 ns/op	   46066 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   23706	     47628 ns/op	   46067 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   25988	     46458 ns/op	   46067 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   24549	     48589 ns/op	   46068 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   25482	     47724 ns/op	   46065 B/op	      48 allocs/op
+BenchmarkPartTwo-10    	   25838	     51169 ns/op	   46068 B/op	      48 allocs/op
+PASS
+ok  	advent-of-code/2019/day-1	30.257s
