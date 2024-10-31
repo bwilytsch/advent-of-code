@@ -1,5 +1,5 @@
 [package]
-name = "advent-of-code"
+name = "advent_of_code"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,3 +8,9 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.91"
 
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "benchmarks"
+harness = false
