@@ -8,8 +8,8 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     match input {
         Ok(input) => {
-            c.bench_function("2015 | day 1 | part 1", |b| b.iter(|| part_one(&input)));
-            c.bench_function("2015 | day 1 | part 2", |b| b.iter(|| part_two(&input)));
+            c.bench_function("2019 | day 1 | part 1", |b| b.iter(|| part_one(&input)));
+            c.bench_function("2019 | day 1 | part 2", |b| b.iter(|| part_two(&input)));
         }
         Err(e) => {
             println!("error: {}", e);
