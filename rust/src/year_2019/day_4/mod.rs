@@ -75,21 +75,18 @@ fn part_one(input: &str) -> Result<i32> {
 }
 
 fn part_two(input: &str) -> Result<i32> {
-    let mut count = 0;
-    let ranges = input
+    let [start, end] = input
         .split('-')
         .map(|sub| sub.parse::<i32>().unwrap())
-        .collect::<Vec<_>>();
+        .collect::<Vec<_>>()[..]
+    // this last part creates a slice out of a Vec
+    else {
+        return Ok(0); // Refutable pattern
+    };
 
-    if let (Some(start), Some(end)) = (ranges.first(), ranges.get(1)) {
-        for pw in *start..=*end {
-            if check_thorough(&pw.to_string()) {
-                count += 1;
-            }
-        }
-    }
-
-    Ok(count)
+    Ok((start..=end)
+        .filter(|pw| check_thorough(&pw.to_string()))
+        .count() as i32)
 }
 
 #[cfg(test)]
