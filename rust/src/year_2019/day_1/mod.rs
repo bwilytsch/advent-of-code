@@ -59,7 +59,7 @@ mod tests {
 
         let input = fs::read_to_string("./inputs/2019/001/part1.txt")?;
 
-        println!("day one: {:?}", part_one(&input)?);
+        // println!("day one: {:?}", part_one(&input)?);
 
         Ok(())
     }
@@ -71,7 +71,7 @@ mod tests {
 
         let input = fs::read_to_string("./inputs/2019/001/part1.txt")?;
 
-        println!("day two: {:?}", part_two(&input)?);
+        // println!("day two: {:?}", part_two(&input)?);
 
         Ok(())
     }
