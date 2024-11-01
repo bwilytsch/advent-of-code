@@ -24,14 +24,14 @@ fn check(num: &str) -> bool {
     true
 }
 
-fn check_thorough(num: &str) -> bool {
+fn check_thorough(num: &i32) -> bool {
     let mut prev = 0;
     let mut doubled = false;
     let mut collector: Vec<u32> = vec![];
 
     // needs a pair, groups of 2 or more don't count
 
-    for n in num.chars().filter_map(|c| c.to_digit(10)) {
+    for n in num.to_string().chars().filter_map(|c| c.to_digit(10)) {
         if n < prev {
             return false;
         }
@@ -84,9 +84,7 @@ fn part_two(input: &str) -> Result<i32> {
         return Ok(0); // Refutable pattern
     };
 
-    Ok((start..=end)
-        .filter(|pw| check_thorough(&pw.to_string()))
-        .count() as i32)
+    Ok((start..=end).filter(check_thorough).count() as i32)
 }
 
 #[cfg(test)]
@@ -106,9 +104,9 @@ mod test {
 
     #[test]
     fn two() -> Result<()> {
-        assert!(check_thorough("112233"));
-        assert!(!check_thorough("123444"));
-        assert!(check_thorough("111122"));
+        assert!(check_thorough(&112233));
+        assert!(!check_thorough(&123444));
+        assert!(check_thorough(&111122));
 
         println!("{}", part_two("347312-805915")?);
 
