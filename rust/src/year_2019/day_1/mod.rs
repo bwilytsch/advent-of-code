@@ -48,7 +48,7 @@ pub fn part_two(input: &str) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
+    // use std::fs;
 
     use super::*;
 
@@ -57,8 +57,7 @@ mod tests {
         assert_eq!(part_one("1969")?, "654");
         assert_eq!(part_one("100756")?, "33583");
 
-        let input = fs::read_to_string("./inputs/2019/001/part1.txt")?;
-
+        // let input = fs::read_to_string("./inputs/2019/001/part1.txt")?;
         // println!("day one: {:?}", part_one(&input)?);
 
         Ok(())
@@ -69,8 +68,7 @@ mod tests {
         assert_eq!(part_two("1969")?, "966");
         assert_eq!(part_two("100756")?, "50346");
 
-        let input = fs::read_to_string("./inputs/2019/001/part1.txt")?;
-
+        // let input = fs::read_to_string("./inputs/2019/001/part1.txt")?;
         // println!("day two: {:?}", part_two(&input)?);
 
         Ok(())
