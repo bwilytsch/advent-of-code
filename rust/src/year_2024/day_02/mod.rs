@@ -19,7 +19,8 @@ fn is_safe(levels: &Vec<i32>) -> Option<i32> {
 pub fn part_one(input: &str) -> Result<usize> {
     Ok(input
         .lines()
-        .filter_map(|report| is_safe(&parse_input(&report)))
+        .map(parse_input)
+        .filter_map(|levels| is_safe(&levels))
         .count())
 }
 
