@@ -8,7 +8,7 @@ fn day_1(c: &mut Criterion) {
 
     match input {
         Ok(input) => {
-            c.bench_function("2019 | day 1 | part 1", |b| {
+            c.bench_function("2024 | day 1 | part 1", |b| {
                 b.iter(|| year_2024::day_01::part_one(&input))
             });
             c.bench_function("2024 | day 1 | part 2", |b| {
