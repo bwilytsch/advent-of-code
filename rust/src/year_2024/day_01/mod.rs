@@ -27,7 +27,7 @@ pub fn part_one(input: &str) -> Result<i32> {
 pub fn part_two(input: &str) -> Result<i32> {
     let columns: (Vec<&str>, Vec<&str>) = input
         .lines()
-        .map(|line| line.trim().split_once(' ').unwrap())
+        .filter_map(|line| line.trim().split_once(' '))
         .unzip();
 
     let mut lot: HashMap<i32, i32> = HashMap::new();
@@ -35,7 +35,7 @@ pub fn part_two(input: &str) -> Result<i32> {
     for entry in columns
         .1
         .iter()
-        .map(|value| value.trim().parse::<i32>().unwrap())
+        .filter_map(|value| value.trim().parse::<i32>().ok())
     {
         match lot.get(&entry) {
             Some(count) => {
