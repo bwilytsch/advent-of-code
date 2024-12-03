@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use regex::Regex;
 
 fn sum_valid(input: &str) -> Result<i32> {
@@ -16,23 +16,19 @@ pub fn part_one(input: &str) -> Result<i32> {
 }
 
 pub fn part_two(input: &str) -> Result<i32> {
-    let mut sum = 0;
-    let chunks = input.split("don't()").collect::<Vec<&str>>();
-
-    let (first, remaining) = chunks.split_first().unwrap();
+    let mut chunks = input.split("don't()");
+    let first = chunks.next().ok_or_else(|| anyhow!("Input is empty"))?;
 
     let value = sum_valid(first)?;
-    sum += value;
 
-    remaining.iter().for_each(|c| {
-        let result = c.split("do()").skip(1).collect::<Vec<&str>>().concat();
+    let value_2: i32 = chunks
+        .filter_map(|c| {
+            let result = c.split("do()").skip(1).collect::<Vec<&str>>().concat();
+            sum_valid(&result).ok()
+        })
+        .sum();
 
-        let value = sum_valid(&result).unwrap();
-
-        sum += value;
-    });
-
-    Ok(sum)
+    Ok(value + value_2)
 }
 
 #[cfg(test)]
