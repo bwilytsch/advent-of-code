@@ -39,5 +39,23 @@ fn day_2(c: &mut Criterion) {
     }
 }
 
-criterion_group!(benches, day_1, day_2);
+fn day_3(c: &mut Criterion) {
+    let input = fs::read_to_string("./inputs/2024/003/input.txt");
+
+    match input {
+        Ok(input) => {
+            c.bench_function("2024 | day 3 | part 1", |b| {
+                b.iter(|| year_2024::day_03::part_one(&input))
+            });
+            c.bench_function("2024 | day 3 | part 2", |b| {
+                b.iter(|| year_2024::day_03::part_two(&input))
+            });
+        }
+        Err(e) => {
+            println!("error: {}", e);
+        }
+    }
+}
+
+criterion_group!(benches, day_1, day_2, day_3);
 criterion_main!(benches);
