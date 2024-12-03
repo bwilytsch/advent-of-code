@@ -1,7 +1,7 @@
 use anyhow::Result;
 use regex::Regex;
 
-fn find_valid(input: &str) -> Result<i32> {
+fn sum_valid(input: &str) -> Result<i32> {
     let mut sum = 0;
     let re = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").unwrap();
     for (_, [a, b]) in re.captures_iter(input).map(|c| c.extract()) {
@@ -12,11 +12,27 @@ fn find_valid(input: &str) -> Result<i32> {
 }
 
 pub fn part_one(input: &str) -> Result<i32> {
-    find_valid(input)
+    sum_valid(input)
 }
 
 pub fn part_two(input: &str) -> Result<i32> {
-    Ok(0)
+    let mut sum = 0;
+    let chunks = input.split("don't()").collect::<Vec<&str>>();
+
+    let (first, remaining) = chunks.split_first().unwrap();
+
+    let value = sum_valid(first)?;
+    sum += value;
+
+    remaining.iter().for_each(|c| {
+        let result = c.split("do()").skip(1).collect::<Vec<&str>>().concat();
+
+        let value = sum_valid(&result).unwrap();
+
+        sum += value;
+    });
+
+    Ok(sum)
 }
 
 #[cfg(test)]
@@ -42,6 +58,10 @@ mod tests {
         let example = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
 
         assert_eq!(part_two(example)?, 48);
+
+        if let Ok(input) = fs::read_to_string("./inputs/2024/003/input.txt") {
+            println!("{}", part_two(&input)?);
+        }
 
         Ok(())
     }
