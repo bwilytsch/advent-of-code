@@ -1,33 +1,18 @@
 import os
 
 def part_one(input: str) -> int:
-    sum = 0
-    lines = input.strip().split('\n')
+    left, right = [], []
 
-    left = []
-    right = []
+    original = [x for sublist in [[int(x) for x in line.split()] for line in input.strip().splitlines()] for x in sublist]
+    left, right = original[::2], original[1::2]
 
-    for line in lines:
-        (a,b) = list(filter(len, line.strip().split(" ")))
-
-        left.append(int(a))
-        right.append(int(b))
-
-    left.sort()
-    right.sort()
-
-    for i, value in enumerate(left):
-       sum += abs(value - right[i])
-
-    return sum
+    return sum(abs(x - y) for x,y in zip(sorted(left), sorted(right)))
 
 def part_two(input: str) -> int:
     lines = input.strip().split('\n')
 
-
     lot = {}
     left = []
-
 
     for line in lines:
         (a,b) = list(filter(len, line.strip().split(" ")))
@@ -50,5 +35,5 @@ def part_two(input: str) -> int:
 dir = os.path.dirname(__file__);
 input = open(os.path.join(dir, "day_1_input.txt")).read()
 
-print(part_one(input))
-print(part_two(input))
+print("Day 1 | Part 1: ", part_one(input))
+print("Day 1 | Part 2", part_two(input))
