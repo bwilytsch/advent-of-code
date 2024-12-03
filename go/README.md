@@ -16,4 +16,7 @@ $ go test -bench <dir> -benchmem > <file.txt>
 ```bash
 $ benchstat <file_1> <file_2>
 ```
-
+# Run specific tests
+```bash
+$ go test <test_file> ...<any_file_used_in_test_file>
+```
