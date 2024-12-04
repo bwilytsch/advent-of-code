@@ -3,6 +3,7 @@ use anyhow::Result;
 // # Learnings
 // - I can use slices of chars
 // - Cancel out early when out of boundary or not matching the combination
+// Avoid Options for performance if can be
 
 struct Grid {
     columns: i32,
@@ -52,47 +53,42 @@ fn get_solutions(
     results
 }
 
+fn collect_chars(
+    x: &i32,
+    y: &i32,
+    dirs: &Vec<(i32, i32)>,
+    input: &[char],
+    grid: &Grid,
+) -> Vec<char> {
+    let mut result = dirs
+        .iter()
+        .map(|dir| {
+            let x = x + dir.0 as i32;
+            let y = y + dir.1 as i32;
+
+            if x >= grid.columns || y >= grid.rows || x < 0 || y < 0 {
+                return '.';
+            }
+
+            let new_index = get_index(&x, &y, grid);
+
+            input[new_index]
+        })
+        .collect::<Vec<char>>();
+
+    result.sort();
+
+    result
+}
+
 fn get_solutions_cross(idx: &i32, input: &[char], grid: &Grid) -> usize {
     let pattern = vec!['M', 'S']; // this is already sorted
     let left = vec![(-1, -1), (1, 1)];
     let right = vec![(1, -1), (-1, 1)];
 
     let (sx, sy) = get_position_from_index(idx, grid);
-
-    let mut l = left
-        .iter()
-        .map(|dir| {
-            let x = sx + dir.0 as i32;
-            let y = sy + dir.1 as i32;
-
-            if x >= grid.columns || y >= grid.rows || x < 0 || y < 0 {
-                return '.';
-            }
-
-            let new_index = get_index(&x, &y, grid);
-
-            input[new_index]
-        })
-        .collect::<Vec<char>>();
-
-    let mut r = right
-        .iter()
-        .map(|dir| {
-            let x = sx + dir.0 as i32;
-            let y = sy + dir.1 as i32;
-
-            if x >= grid.columns || y >= grid.rows || x < 0 || y < 0 {
-                return '.';
-            }
-
-            let new_index = get_index(&x, &y, grid);
-
-            input[new_index]
-        })
-        .collect::<Vec<char>>();
-
-    l.sort();
-    r.sort();
+    let l = collect_chars(&sx, &sy, &left, &input, &grid);
+    let r = collect_chars(&sx, &sy, &right, &input, &grid);
 
     match l == pattern && r == pattern {
         true => 1,
