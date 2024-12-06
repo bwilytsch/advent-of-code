@@ -14,7 +14,6 @@ fn bubble_sort(pages: &Vec<&str>, rules: &HashMap<&str, HashSet<&str>>) -> Optio
 
             if let Some(rule) = rules.get(b) {
                 if rule.contains(a) {
-                    // If b should come before a, swap them
                     v.swap(i, i + 1);
                     swapped = true;
                 }
