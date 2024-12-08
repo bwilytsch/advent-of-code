@@ -158,29 +158,28 @@ fn explore(start: &i32, start_dir: &usize, grid: &Grid, chars: &Vec<char>) -> Ve
 }
 
 fn check_loop(
-    start: &Point,
-    cache: &Vec<Point>,
-    cur: &Point,
-    start_dir: &usize,
+    start: &(Point, usize),
+    cache: &Vec<(Point, usize)>,
+    cur: &(Point, usize),
     grid: &Grid,
     chars: &Vec<char>,
 ) -> bool {
-    let mut pos = start.clone();
-
-    let mut adjusted_chars = chars.clone();
-    let mut visited: Vec<Point> = cache.clone();
-
-    let mut collisions: HashMap<Point, usize> = HashMap::new();
-
-    // Backfill other items for viz
-    for p in visited.iter() {
-        let pos_index = position_to_index(&p.x, &p.y, grid);
-        adjusted_chars[pos_index as usize] = 'X';
+    if start == cur {
+        return false;
     }
 
-    // print_path(&adjusted_chars, grid);
+    let mut v = start.clone();
 
-    let mut dir = start_dir.clone();
+    let mut adjusted_chars = chars.clone();
+
+    let mut visited: HashMap<(Point, usize), usize> = HashMap::new();
+
+    for v in cache {
+        let p = position_to_index(&v.0.x, &v.0.y, grid) as usize;
+        adjusted_chars[p] = 'X';
+        visited.insert(*v, 1);
+    }
+
     let dirs = vec![
         Point::new(0, -1),
         Point::new(1, 0),
@@ -188,48 +187,39 @@ fn check_loop(
         Point::new(-1, 0),
     ];
 
-    if is_inbounds(&cur, grid) {
-        let idx = position_to_index(&cur.x, &cur.y, grid) as usize;
+    if is_inbounds(&cur.0, grid) {
+        let idx = position_to_index(&cur.0.x, &cur.0.y, grid) as usize;
         adjusted_chars[idx] = 'O';
     }
 
-    let mut counter = 0;
+    let mut dir = v.1;
 
-    while is_inbounds(&pos, &grid) {
-        visited.push(pos);
-        let pos_index = position_to_index(&pos.x, &pos.y, grid);
+    while is_inbounds(&v.0, &grid) {
+        let current_state = (v.0, dir);
+        let count = visited
+            .entry(current_state)
+            .and_modify(|e| *e += 1)
+            .or_insert(1);
+
+        if *count >= 3 {
+            return true;
+        }
+
+        let pos_index = position_to_index(&v.0.x, &v.0.y, grid);
         adjusted_chars[pos_index as usize] = 'X';
 
         let heading = dirs[dir];
-        let new_position = pos.add_point(heading);
+        let new_position = v.0.add_point(heading);
         let next = position_to_index(&new_position.x, &new_position.y, grid);
 
         match adjusted_chars.get(next as usize) {
-            Some(c) if *c == 'O' => {
-                dir = (dir + 1) % dirs.len();
-
-                counter += 1;
-
-                if counter > 1 {
-                    return true;
-                }
-
-                continue;
-            }
-            Some(c) if *c == '#' => {
-                let entry = collisions.entry(pos).or_insert(0);
-                *entry += 1;
-
-                if *entry > 1 {
-                    return true;
-                }
-
+            Some(c) if *c == 'O' || *c == '#' => {
                 dir = (dir + 1) % dirs.len();
 
                 continue;
             }
             _ => {
-                pos = new_position;
+                v.0 = new_position;
             }
         }
     }
@@ -266,19 +256,17 @@ pub fn part_two(input: &str) -> Result<usize> {
         .unwrap() as i32;
 
     let solved_map = explore(&guard, &forward_dir, &grid, &chars);
-
     println!("{}", solved_map.len());
 
     let mut count = 0;
     let mut cache = vec![];
-    let mut prev = solved_map.clone().into_iter().next().unwrap().0;
+    let mut prev = solved_map.clone().into_iter().next().unwrap();
 
-    for (cur, dir) in solved_map.iter().skip(1) {
-        let next = cur.clone();
+    for v in solved_map.iter() {
+        let next = v.clone();
         cache.push(next);
 
-        if check_loop(&prev, &cache, &cur, &dir, &grid, &chars) {
-            // println!("{count}");
+        if check_loop(&prev, &cache, &next, &grid, &chars) {
             count += 1;
         }
 
@@ -313,6 +301,7 @@ mod tests {
             assert_eq!(part_two(&input)?, 6);
         };
 
+        // 1715 -- too high
         if let Ok(input) = fs::read_to_string("./inputs/2024/006/input.txt") {
             println!("{}", part_two(&input)?);
         }
