@@ -82,18 +82,6 @@ pub fn part_one(input: &str) -> Result<usize> {
     Ok(visited.len())
 }
 
-fn print_path(chars: &Vec<char>, grid: &Grid) {
-    for i in 0..grid.rows {
-        let slice = chars[((i * grid.columns) as usize)..(((i + 1) * grid.columns) as usize)]
-            .into_iter()
-            .collect::<String>();
-
-        println!("{:?}", slice);
-    }
-
-    println!("")
-}
-
 #[derive(Eq, PartialEq, Debug, Copy, Clone, Hash)]
 struct Point {
     x: i32,
@@ -157,29 +145,7 @@ fn explore(start: &i32, start_dir: &usize, grid: &Grid, chars: &Vec<char>) -> Ve
     visited
 }
 
-fn check_loop(
-    start: &(Point, usize),
-    cache: &Vec<(Point, usize)>,
-    cur: &(Point, usize),
-    grid: &Grid,
-    chars: &Vec<char>,
-) -> bool {
-    if start == cur {
-        return false;
-    }
-
-    let mut v = start.clone();
-
-    let mut adjusted_chars = chars.clone();
-
-    let mut visited: HashMap<(Point, usize), usize> = HashMap::new();
-
-    for v in cache {
-        let p = position_to_index(&v.0.x, &v.0.y, grid) as usize;
-        adjusted_chars[p] = 'X';
-        visited.insert(*v, 1);
-    }
-
+fn check_loop(start: &(Point, usize), grid: &Grid, chars: &Vec<char>) -> bool {
     let dirs = vec![
         Point::new(0, -1),
         Point::new(1, 0),
@@ -187,39 +153,33 @@ fn check_loop(
         Point::new(-1, 0),
     ];
 
-    if is_inbounds(&cur.0, grid) {
-        let idx = position_to_index(&cur.0.x, &cur.0.y, grid) as usize;
-        adjusted_chars[idx] = 'O';
-    }
+    let mut dir = start.1;
+    let mut pos = start.0.clone();
 
-    let mut dir = v.1;
+    let mut visited = HashSet::new();
 
-    while is_inbounds(&v.0, &grid) {
-        let current_state = (v.0, dir);
-        let count = visited
-            .entry(current_state)
-            .and_modify(|e| *e += 1)
-            .or_insert(1);
-
-        if *count >= 3 {
+    while is_inbounds(&pos, &grid) {
+        if visited.contains(&(pos, dir)) {
             return true;
         }
 
-        let pos_index = position_to_index(&v.0.x, &v.0.y, grid);
-        adjusted_chars[pos_index as usize] = 'X';
+        visited.insert((pos, dir));
 
         let heading = dirs[dir];
-        let new_position = v.0.add_point(heading);
+        let new_position = pos.add_point(heading);
+
+        if !is_inbounds(&new_position, &grid) {
+            break;
+        }
+
         let next = position_to_index(&new_position.x, &new_position.y, grid);
 
-        match adjusted_chars.get(next as usize) {
+        match chars.get(next as usize) {
             Some(c) if *c == 'O' || *c == '#' => {
                 dir = (dir + 1) % dirs.len();
-
-                continue;
             }
             _ => {
-                v.0 = new_position;
+                pos = new_position;
             }
         }
     }
@@ -231,7 +191,6 @@ pub fn part_two(input: &str) -> Result<usize> {
     // Assming it always starts going up with `^`
     let chars = input.chars().filter(|c| *c != '\n').collect::<Vec<char>>();
     let forward_dir = 0;
-    let mut obstacles: HashSet<(i32, i32)> = HashSet::new();
 
     let rows = input.lines().count() as i32;
     let columns = input.lines().map(|l| l.len()).max().unwrap() as i32;
@@ -245,32 +204,24 @@ pub fn part_two(input: &str) -> Result<usize> {
                 return Some(i);
             }
 
-            if *c == '#' {
-                let pos = index_to_position(&(i as i32), &grid);
-                obstacles.insert(pos);
-            }
-
             None
         })
         .next()
         .unwrap() as i32;
 
     let solved_map = explore(&guard, &forward_dir, &grid, &chars);
-    println!("{}", solved_map.len());
 
     let mut count = 0;
-    let mut cache = vec![];
-    let mut prev = solved_map.clone().into_iter().next().unwrap();
+    let start = solved_map.first().unwrap();
 
     for v in solved_map.iter() {
-        let next = v.clone();
-        cache.push(next);
+        let mut adjusted_chars = chars.clone();
+        let obstacle = position_to_index(&v.0.x, &v.0.y, &grid) as usize;
+        adjusted_chars[obstacle] = 'O';
 
-        if check_loop(&prev, &cache, &next, &grid, &chars) {
+        if check_loop(&start, &grid, &adjusted_chars) {
             count += 1;
         }
-
-        prev = next;
     }
 
     Ok(count)
