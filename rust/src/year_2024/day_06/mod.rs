@@ -145,6 +145,59 @@ fn explore(start: &i32, start_dir: &usize, grid: &Grid, chars: &Vec<char>) -> Ve
     visited
 }
 
+const DIRS: [(i32, i32); 4] = [(0, -1), (1, 0), (0, 1), (-1, 0)];
+
+fn check_loop_fast(start: &(Point, usize), grid: &Grid, chars: &Vec<char>) -> bool {
+    let mut dir = start.1;
+    let mut pos = start.0.clone();
+
+    // Pre-calculate grid bounds for faster checks
+    let max_x = grid.columns - 1;
+    let max_y = grid.rows - 1;
+
+    // Use a more efficient data structure for position+direction tracking
+    // Assuming your grid isn't huge, we can use a flat array/vec instead of HashSet
+    let mut visited = vec![false; (grid.columns as usize) * (grid.rows as usize) * 4];
+
+    loop {
+        // Fast bounds check with pre-calculated values
+        if pos.x < 0 || pos.y < 0 || pos.x > max_x || pos.y > max_y {
+            break;
+        }
+
+        // Convert current state to single index for visited array
+        let visit_index = (pos.x + pos.y * grid.columns) as usize * 4 + dir;
+
+        if visited[visit_index] {
+            return true;
+        }
+        visited[visit_index] = true;
+
+        // Use constant array instead of vector
+        let (dx, dy) = DIRS[dir];
+        let new_x = pos.x + dx;
+        let new_y = pos.y + dy;
+
+        // Early bounds check before creating new Point
+        if new_x < 0 || new_y < 0 || new_x > max_x || new_y > max_y {
+            break;
+        }
+
+        let next = position_to_index(&new_x, &new_y, grid);
+
+        match chars.get(next as usize) {
+            Some(&'O' | &'#') => {
+                dir = (dir + 1) & 3; // Fast modulo for power of 2
+            }
+            _ => {
+                pos.x = new_x;
+                pos.y = new_y;
+            }
+        }
+    }
+    false
+}
+
 fn check_loop(start: &(Point, usize), grid: &Grid, chars: &Vec<char>) -> bool {
     let dirs = vec![
         Point::new(0, -1),
@@ -221,7 +274,7 @@ pub fn part_two(input: &str) -> Result<usize> {
         let obstacle = position_to_index(&v.0.x, &v.0.y, &grid) as usize;
         adjusted_chars[obstacle] = 'O';
 
-        if check_loop(&start, &grid, &adjusted_chars) {
+        if check_loop_fast(&start, &grid, &adjusted_chars) {
             count += 1;
         }
     }
@@ -254,7 +307,6 @@ mod tests {
             assert_eq!(part_two(&input)?, 6);
         };
 
-        // 1715 -- too high
         if let Ok(input) = fs::read_to_string("./inputs/2024/006/input.txt") {
             println!("{}", part_two(&input)?);
         }
