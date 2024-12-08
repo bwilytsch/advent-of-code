@@ -17,3 +17,7 @@ criterion = { version = "0.5", features = ["html_reports"] }
 [[bench]]
 name = "benchmarks"
 harness = false
+
+# Run test in release mode
+# [profile.test]
+# inherits = "release"

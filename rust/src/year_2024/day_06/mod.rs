@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use anyhow::Result;
 
@@ -168,6 +168,8 @@ fn check_loop(start: &(Point, usize), grid: &Grid, chars: &Vec<char>) -> bool {
         let heading = dirs[dir];
         let new_position = pos.add_point(heading);
 
+        // NOTE: This broke my neck mutliple times, remember to always boundary check the new
+        // position
         if !is_inbounds(&new_position, &grid) {
             break;
         }
