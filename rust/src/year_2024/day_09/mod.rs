@@ -79,72 +79,54 @@ pub fn part_one(input: &str) -> Result<u64> {
 // Check the gaussian solution
 pub fn part_two(input: &str) -> Result<u64> {
     let mut files: HashMap<u64, (u64, u64)> = HashMap::new();
-    let mut blanks = vec![];
+    let mut blanks: Vec<(u64, u64)> = vec![];
 
     let mut fid: u64 = 0;
-    let mut pos = 0;
+    let mut pos: u64 = 0;
 
-    for (i, x) in input
-        .chars()
-        .filter_map(|c| c.to_string().parse::<u64>().ok())
-        .enumerate()
-    {
+    for (i, c) in input.trim().chars().enumerate() {
+        let x = c
+            .to_string()
+            .parse::<u64>()
+            .expect("Non-digit character encountered") as u64;
         if i % 2 == 0 {
-            files.insert(fid, (pos, x as u64));
+            files.insert(fid, (pos, x));
             fid += 1;
         } else {
             if x != 0 {
                 blanks.push((pos, x));
             }
         }
-
-        pos += x as u64;
+        pos += x;
     }
 
     while fid > 0 {
         fid -= 1;
 
-        let mut remove_blank_at = None;
-        let mut new_blank = None;
-        let mut new_pos = None;
+        let (file_pos, size) = files[&fid];
 
-        let (pos, size) = files[&fid];
-        for (i, &(start, length)) in blanks.iter().enumerate() {
-            if start >= pos {
+        for i in 0..blanks.len() {
+            let (start, length) = blanks[i];
+            if start >= file_pos {
                 blanks.truncate(i);
                 break;
             }
 
             if size <= length as u64 {
-                new_pos = Some(start);
-
+                files.insert(fid, (start, size));
                 if size == length as u64 {
-                    remove_blank_at = Some(i);
+                    blanks.remove(i);
                 } else {
-                    new_blank = Some((i, (start + size, length - size)));
+                    blanks[i] = (start + size, length - size);
                 }
-
                 break;
             }
-        }
-
-        if let Some(i) = remove_blank_at {
-            blanks.remove(i);
-        }
-
-        if let Some(start) = new_pos {
-            files.insert(fid, (start, size));
-        }
-
-        if let Some((i, blank)) = new_blank {
-            blanks.insert(i, blank);
         }
     }
 
     let mut checksum = 0;
-
     for (fid, (pos, size)) in files.iter() {
-        for x in *pos..(*pos + size) {
+        for x in *pos..(*pos + *size) {
             checksum += fid * x;
         }
     }
@@ -164,7 +146,6 @@ mod tests {
             assert_eq!(part_one(&input)?, 1928);
         };
 
-        // 89813169309 - too low
         if let Ok(input) = fs::read_to_string("./inputs/2024/009/input.txt") {
             println!("{}", part_one(&input)?);
         };
@@ -174,13 +155,12 @@ mod tests {
 
     #[test]
     fn two() -> Result<()> {
-        // if let Ok(input) = fs::read_to_string("./inputs/2024/009/example.txt") {
-        //     assert_eq!(part_two(&input)?, 2858);
-        // };
+        if let Ok(input) = fs::read_to_string("./inputs/2024/009/example.txt") {
+            assert_eq!(part_two(&input)?, 2858);
+        };
 
-        // 8460423284794 -- too high
         if let Ok(input) = fs::read_to_string("./inputs/2024/009/input.txt") {
-            println!("{}", part_two(&input)?);
+            assert_eq!(part_two(&input)?, 6301361958738);
         }
 
         Ok(())
