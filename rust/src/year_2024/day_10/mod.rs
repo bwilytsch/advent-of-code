@@ -91,17 +91,19 @@ fn parse_input(input: &str, grid: &Grid) -> (Vec<Point>, Vec<u32>) {
 fn climb(start: &Point, grid: &Grid, values: &Vec<u32>) -> Vec<Point> {
     let mut paths = vec![];
 
-    let a = move_to(&start, &DIRS[0]);
-    let b = move_to(&start, &DIRS[1]);
-    let c = move_to(&start, &DIRS[2]);
-    let d = move_to(&start, &DIRS[3]);
-
-    traverse(&a, &0, &grid, &values, &mut paths);
-    traverse(&b, &0, &grid, &values, &mut paths);
-    traverse(&c, &0, &grid, &values, &mut paths);
-    traverse(&d, &0, &grid, &values, &mut paths);
+    for d in &DIRS {
+        let next = move_to(&start, d);
+        traverse(&next, &0, &grid, &values, &mut paths);
+    }
 
     paths
+}
+
+fn get_grid(input: &str) -> Grid {
+    let mut lines = input.lines();
+    let rows = input.lines().count();
+    let columns = lines.next().expect("lol").len();
+    Grid { rows, columns }
 }
 
 fn traverse(
@@ -127,31 +129,21 @@ fn traverse(
         return;
     }
 
-    let a = move_to(start, &DIRS[0]);
-    let b = move_to(start, &DIRS[1]);
-    let c = move_to(start, &DIRS[2]);
-    let d = move_to(start, &DIRS[3]);
-
-    traverse(&a, &value, grid, values, summits);
-    traverse(&b, &value, grid, values, summits);
-    traverse(&c, &value, grid, values, summits);
-    traverse(&d, &value, grid, values, summits);
+    for d in &DIRS {
+        let next = move_to(&start, d);
+        traverse(&next, &value, grid, values, summits);
+    }
 }
 
 pub fn part_one(input: &str) -> Result<usize> {
-    // trailheads start at elevation 0 and go to 9
-    let mut lines = input.lines();
-    let rows = input.lines().count();
-    let columns = lines.next().expect("lol").len();
-    let grid = Grid { rows, columns };
-
+    let grid = get_grid(&input);
     let (trailheads, values) = parse_input(&input, &grid);
     let mut sum = 0;
 
     for th in &trailheads {
         let paths = climb(&th, &grid, &values);
+        // NOTE: Need to be unique
         let summits: HashSet<Point> = HashSet::from_iter(paths);
-
         sum += summits.len()
     }
 
@@ -159,11 +151,7 @@ pub fn part_one(input: &str) -> Result<usize> {
 }
 
 pub fn part_two(input: &str) -> Result<usize> {
-    let mut lines = input.lines();
-    let rows = input.lines().count();
-    let columns = lines.next().expect("lol").len();
-    let grid = Grid { rows, columns };
-
+    let grid = get_grid(&input);
     let (trailheads, values) = parse_input(&input, &grid);
     let mut sum = 0;
 
