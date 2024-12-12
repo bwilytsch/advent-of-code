@@ -198,50 +198,6 @@ fn check_loop_fast(start: &(Point, usize), grid: &Grid, chars: &Vec<char>) -> bo
     false
 }
 
-fn check_loop(start: &(Point, usize), grid: &Grid, chars: &Vec<char>) -> bool {
-    let dirs = vec![
-        Point::new(0, -1),
-        Point::new(1, 0),
-        Point::new(0, 1),
-        Point::new(-1, 0),
-    ];
-
-    let mut dir = start.1;
-    let mut pos = start.0.clone();
-
-    let mut visited = HashSet::new();
-
-    while is_inbounds(&pos, &grid) {
-        if visited.contains(&(pos, dir)) {
-            return true;
-        }
-
-        visited.insert((pos, dir));
-
-        let heading = dirs[dir];
-        let new_position = pos.add_point(heading);
-
-        // NOTE: This broke my neck mutliple times, remember to always boundary check the new
-        // position
-        if !is_inbounds(&new_position, &grid) {
-            break;
-        }
-
-        let next = position_to_index(&new_position.x, &new_position.y, grid);
-
-        match chars.get(next as usize) {
-            Some(c) if *c == 'O' || *c == '#' => {
-                dir = (dir + 1) % dirs.len();
-            }
-            _ => {
-                pos = new_position;
-            }
-        }
-    }
-
-    false
-}
-
 pub fn part_two(input: &str) -> Result<usize> {
     // Assming it always starts going up with `^`
     let chars = input.chars().filter(|c| *c != '\n').collect::<Vec<char>>();
