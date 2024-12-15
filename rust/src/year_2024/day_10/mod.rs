@@ -1,6 +1,5 @@
-use std::{cmp::Ordering, collections::HashSet, fmt::Display};
-
 use anyhow::Result;
+use std::{cmp::Ordering, collections::HashSet, fmt::Display};
 
 // This is a very bad and verbose attempt of this, should come back to this later
 
