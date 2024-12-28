@@ -16,6 +16,8 @@ mod tests {
     fn one() -> Result<()> {
         Ok(())
     }
+
+    #[test]
     fn two() -> Result<()> {
         Ok(())
     }

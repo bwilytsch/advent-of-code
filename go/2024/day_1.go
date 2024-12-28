@@ -9,6 +9,7 @@ import (
 
 func partOne(input string) int {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
+
 	var sum float64 = 0
 
 	left := []int{}

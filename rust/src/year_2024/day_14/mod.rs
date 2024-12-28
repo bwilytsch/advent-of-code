@@ -48,8 +48,6 @@ impl From<&str> for Robot {
     }
 }
 
-fn print_robots(robots: &Vec<Robot>, room: &Room) {}
-
 pub fn part_one(input: &str, room: Room, t: isize) -> Result<isize> {
     let robots = input.lines().map(|l| l.into()).collect::<Vec<Robot>>();
     let w = room.max.0;
@@ -109,16 +107,86 @@ pub fn part_one(input: &str, room: Room, t: isize) -> Result<isize> {
     Ok(sum)
 }
 
-pub fn part_two(input: &str, room: Room, t: isize) -> Result<isize> {
+pub fn part_two(input: &str, room: Room) -> Result<isize> {
     let robots = input.lines().map(|l| l.into()).collect::<Vec<Robot>>();
+    let w = room.max.0;
+    let h = room.max.1;
+    let hw = w / 2; // Half-width (integer division)
+    let hh = h / 2; // Half-height (integer division)
 
-    for mut r in robots.clone() {
-        r.move_on_grid(t, &room);
-        let x = r.pos.0;
-        let y = r.pos.1;
+    // Define quadrants while skipping the center row and column, programmatically create these
+    let mut quadrants = [
+        (
+            Room {
+                min: Vector(0, 0),
+                max: Vector(hw, hh),
+            },
+            vec![],
+        ), // Top-left
+        (
+            Room {
+                min: Vector(hw + 1, 0),
+                max: Vector(w, hh),
+            },
+            vec![],
+        ), // Top-right
+        (
+            Room {
+                min: Vector(0, hh + 1),
+                max: Vector(hw, h),
+            },
+            vec![],
+        ), // Bottom-left
+        (
+            Room {
+                min: Vector(hw + 1, hh + 1),
+                max: Vector(w, h),
+            },
+            vec![],
+        ), // Bottom-right
+    ];
+
+    // Check for the smalle distribution
+    let mut sf = usize::MAX;
+    let mut step = 0;
+
+    let mut current_robots = robots.clone();
+
+    for i in 0..(room.max.0 * room.max.1) {
+        // Clear quadrants for this time step
+        for (_, robots) in quadrants.iter_mut() {
+            robots.clear();
+        }
+
+        // Update each robot's position
+        for r in current_robots.iter_mut() {
+            r.move_on_grid(i as isize, &room);
+            let x = r.pos.0;
+            let y = r.pos.1;
+
+            // Assign to quadrant
+            for q in quadrants.iter_mut() {
+                if x >= q.0.min.0 && y >= q.0.min.1 && x < q.0.max.0 && y < q.0.max.1 {
+                    q.1.push(r.clone());
+                    break;
+                }
+            }
+        }
+
+        let sum: usize = quadrants
+            .iter()
+            .fold(1, |acc, (_, robots)| acc * (robots.len()));
+
+        if sum < sf {
+            sf = sum;
+            step = i;
+        }
     }
 
-    Ok(0)
+    // 1028 -- not working
+    // 7610 -- too high
+    // 672 -- too low
+    Ok(step)
 }
 
 #[cfg(test)]
@@ -182,7 +250,6 @@ p=9,5 v=-3,-3";
                         min: Vector(0, 0),
                         max: Vector(101, 103),
                     },
-                    0
                 )?
             )
         }
